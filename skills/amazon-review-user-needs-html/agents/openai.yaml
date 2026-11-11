@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon 评论用户需求分析"
+  short_description: "从 JTBD 与痛点提炼结果型用户需求并生成中文 HTML"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "VOC Needs Map"
+  short_description: "Build user needs maps from product and VOC inputs."
+  default_prompt: "Use $voc-needs-map to turn product specs and VOC evidence into a user needs map and HTML report."

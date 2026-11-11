@@ -1,0 +1,4 @@
+interface:
+  display_name: "Claude VOC Analysis"
+  short_description: "Deep Amazon VOC analysis based on the Claude workflow."
+  default_prompt: "Use $voc-analysis-claude to analyze these Amazon reviews and create a decision-ready HTML VOC report."

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon 评论痛点分析"
+  short_description: "从评论提取有证据的使用痛点并生成中文 HTML"

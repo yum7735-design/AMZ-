@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual Strategy Generator"
+  short_description: "Plan Amazon image strategy from product and VOC files."
+  default_prompt: "Use $visual-strategy-generator to create a main image and Image 2-7 plan from my product research files."

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon B2B 父体花费占比"
+  short_description: "按父体 ASIN 汇总企业购广告花费占比"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "站外内容情报采集"
+  short_description: "跨平台产品视频发现、真实性核验、去重、分级与飞书素材库建表"
+  default_prompt: "Use $offsite-content-intelligence to collect and structure public off-site video evidence for [product]."
+
+policy:
+  allow_implicit_invocation: true

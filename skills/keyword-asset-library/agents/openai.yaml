@@ -1,0 +1,7 @@
+interface:
+  display_name: "Keyword Asset Library"
+  short_description: "Build 13-sheet Amazon keyword asset libraries"
+  default_prompt: "Use $keyword-asset-library to build a 13-sheet keyword asset library for this Amazon product line."
+
+policy:
+  allow_implicit_invocation: true

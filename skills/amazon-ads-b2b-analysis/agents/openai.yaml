@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon Ads B2B Analysis"
+  short_description: "Analyze Amazon ad types, B2B, campaigns, ASINs and terms"
+  default_prompt: "Use $amazon-ads-b2b-analysis to analyze my Amazon advertising exports and produce an HTML report."

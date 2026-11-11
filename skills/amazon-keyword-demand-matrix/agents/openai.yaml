@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon 需求矩阵"
+  short_description: "基于关键词与用户需求的 Amazon Listing 分析"
+  default_prompt: "Use $amazon-keyword-demand-matrix to build an evidence-based keyword × user demand matrix for my Amazon product inputs."

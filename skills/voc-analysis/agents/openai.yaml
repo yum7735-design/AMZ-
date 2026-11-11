@@ -1,0 +1,7 @@
+interface:
+  display_name: "VOC Analysis"
+  short_description: "Analyze Amazon VOC and reviews for product, competitor, and listing decisions."
+  default_prompt: "Use $voc-analysis to analyze Amazon VOC inputs and produce a structured product insight report."
+
+policy:
+  allow_implicit_invocation: true

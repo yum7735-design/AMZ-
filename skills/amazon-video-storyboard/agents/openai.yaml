@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon Video Storyboard"
+  short_description: "Create timed storyboards and ecommerce production plans"
+  default_prompt: "Use $amazon-video-storyboard to turn this approved creative brief into 15s, 30s, and 60s production-ready storyboards."

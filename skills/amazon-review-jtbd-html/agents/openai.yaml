@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon 评论 JTBD 分析"
+  short_description: "从评论提取使用任务并生成可筛选 HTML"

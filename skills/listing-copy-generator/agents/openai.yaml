@@ -1,0 +1,4 @@
+interface:
+  display_name: "Listing Copy Generator"
+  short_description: "Generate Amazon listing copy from VOC and keyword inputs."
+  default_prompt: "Use $listing-copy-generator to create Amazon listing copy from product data, needs maps, and demand matrices."

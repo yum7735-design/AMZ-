@@ -1,0 +1,17 @@
+{
+  "name": "alexa-questions-scraper",
+  "version": "1.0.0",
+  "description": "Scrape Amazon Alexa AI questions + Feishu integration",
+  "type": "module",
+  "scripts": {
+    "scrape": "node cli.mjs scrape",
+    "login": "node cli.mjs login",
+    "import": "node cli.mjs import",
+    "feishu": "node cli.mjs feishu",
+    "feishu:dry": "node cli.mjs feishu --dry-run",
+    "feishu:limit": "node cli.mjs feishu --limit"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0"
+  }
+}

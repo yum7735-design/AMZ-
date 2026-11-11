@@ -1,0 +1,7 @@
+interface:
+  display_name: "运营周经营复盘"
+  short_description: "读取飞书多维表格数据，自动生成运营周报HTML报告，含异常检测、根因分析、竞品对比、库存预警和动作建议"
+  default_prompt: "使用 $weekly-ops-review 读取飞书多维表格（FHxDbhbQKaIwrHsuNr3cUBXgn4d）中的周复盘数据、竞品数据和超龄库存数据，检测销售/利润/广告/退货/库存/评分异常，整合竞品排名价格趋势与超龄库存预警，按产品线分层输出中文HTML运营复盘报告到 ops-reports/ 目录。"
+
+policy:
+  allow_implicit_invocation: true

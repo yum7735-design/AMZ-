@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon Video Creative"
+  short_description: "Turn video strategy into shootable creative concepts"
+  default_prompt: "Use $amazon-video-creative to turn this product-video strategy brief into differentiated Amazon video concepts."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon Video Strategy"
+  short_description: "Build evidence-led Amazon product-video strategies"
+  default_prompt: "Use $amazon-video-strategy to create an evidence-led Amazon US product-video strategy from my product and VOC inputs."

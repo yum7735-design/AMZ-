@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon 评论场景分析"
+  short_description: "从 Amazon 评论识别使用场景并生成可筛选 HTML"

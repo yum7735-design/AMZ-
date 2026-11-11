@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon 评论五层标签链"
+  short_description: "场景到产品能力的评论证据链 HTML 分析"
+  default_prompt: "基于指定产品的 Amazon 评论，按主场景→子场景→JTBD→痛点→用户需求→产品能力建立证据化标签链，并生成包含各层占比、交叉矩阵与可筛选明细的离线中文 HTML。"

@@ -1,0 +1,13 @@
+# Sensitive - personal Amazon cookies
+cookies/
+cookies_raw.txt
+
+# Output data
+output/
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/

@@ -1,0 +1,4 @@
+interface:
+  display_name: "飞书评论翻译"
+  short_description: "按 Record ID 批量翻译飞书多维表格评论"
+  default_prompt: "使用 $feishu-bitable-review-translation 翻译指定飞书多维表格中的英文评论，并按原生 Record ID 回填中文评论字段。"

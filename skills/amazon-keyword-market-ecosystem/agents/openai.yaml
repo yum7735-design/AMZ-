@@ -1,0 +1,4 @@
+interface:
+  display_name: "Amazon 关键词市场生态"
+  short_description: "从关键词 ASIN 数据生成市场进入与产品线策略"
+  default_prompt: "Use $amazon-keyword-market-ecosystem to analyze this Amazon keyword market, identify defensible opportunities, and separate evidence from hypotheses."

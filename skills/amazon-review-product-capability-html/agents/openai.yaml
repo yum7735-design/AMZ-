@@ -1,0 +1,3 @@
+interface:
+  display_name: "Amazon 评论产品能力分析"
+  short_description: "从用户需求映射可验证产品能力并生成中文 HTML"
