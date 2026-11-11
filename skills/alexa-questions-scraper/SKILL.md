@@ -87,8 +87,8 @@ python main.py scrape --file asins.txt -o my_project
 ### 飞书自动化
 
 **飞书表配置：**
-- Base: `<FEISHU_BASE_TOKEN>`
-- Table: `<FEISHU_TABLE_ID>`
+- Base: `P9L2bZrXbayewqs1QbEc0LaAnhh`
+- Table: `tblSlh97FgzK4wCc`
 - ASIN 字段：`ASIN`（主字段，手工填入）
 
 **运行：**
@@ -130,7 +130,7 @@ python run_feishu.py --limit 5
 - **Cookie 有效期**：通常约 1 年，过期后重新登录即可
 - **不要并发**：同时只有一个 Playwright 实例在跑，避免触发风控
 - **IP 限制**：同一 IP 短时间大量请求有风险，每批最多 20 个，超过需要手动分批
-- **飞书 App 权限**：使用 <FEISHU_APP_ID>，已授权读写该 Base
+- **飞书 App 权限**：使用 cli_aa87ee17d33c1cc4，已授权读写该 Base
 - **发给别人时**：`.gitignore` 排除了 `cookies/` 和 `output/`，使用者需自己导入 Cookie
 
 ## 项目文件

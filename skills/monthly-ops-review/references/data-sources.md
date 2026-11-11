@@ -2,15 +2,15 @@
 
 ## Base Info
 
-- **App Token**: `<FEISHU_BASE_TOKEN>`
-- **URL**: `https://<tenant>.feishu.cn/base/<base_token>`
+- **App Token**: `UvX8bhS8Larixksj4fjcOvbcn7e`
+- **URL**: `https://xa0j7ax4q5v.feishu.cn/base/UvX8bhS8Larixksj4fjcOvbcn7e`
 - **Auth**: feishu-user-plugin MCP (UAT-first)
 
 ## Tables
 
 ### 1. 月复盘 (Main Monthly Aggregation Table)
 
-- **Table ID**: `<FEISHU_MAIN_TABLE_ID>`
+- **Table ID**: `tblBgs4glsFNq6NJ`
 - **View ID**: `vewGJ1OH5B`
 - **Key**: (年&月, ASIN)
 - **Records per month**: ~200
@@ -150,7 +150,7 @@
 
 ### 5. 超龄库存报告 (Aging Inventory)
 
-- **Table ID**: `<FEISHU_AGING_TABLE_ID>`
+- **Table ID**: `tblf9z0XIaKzmK8z`
 - **Records**: 637
 - **Key**: 序列
 - **IMPORTANT**: JSON keys are English field names (same structure as weekly base)

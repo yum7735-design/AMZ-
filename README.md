@@ -38,6 +38,13 @@ FEISHU_HOST
 
 不要把真实凭据写入代码或提交到 Git。
 
+## 每日同步
+
+`scripts/sync-skills.ps1` 用于把 `D:\Codex\home\skills` 中已经被本仓库纳管的
+Skill 更新到 `skills/`。同步脚本不会自动添加新的 Skill 目录，也不会删除仓库文件，
+并会跳过凭据、Cookie、缓存、依赖目录和运行输出。自动任务还会在提交前检查暂存差异，
+发现疑似敏感信息时停止推送并报告。
+
 ## 说明
 
 部分 Skill 依赖本地 MCP 服务、飞书多维表格或第三方 Amazon 数据服务。使用前请阅读对应目录中的 `SKILL.md`，并按需配置运行环境。

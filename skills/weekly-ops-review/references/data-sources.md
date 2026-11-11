@@ -3,7 +3,7 @@
 ## Base Info
 
 - **App Token**: `FHxDbhbQKaIwrHsuNr3cUBXgn4d`
-- **URL**: `https://<tenant>.feishu.cn/base/<base_token>`
+- **URL**: `https://xa0j7ax4q5v.feishu.cn/base/FHxDbhbQKaIwrHsuNr3cUBXgn4d`
 - **Auth**: feishu-user-plugin MCP (UAT-first)
 
 ## Tables

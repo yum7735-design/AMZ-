@@ -20,9 +20,9 @@ Behavior notes:
 
 Current defaults:
 
-- App ID: `<FEISHU_APP_ID>`
-- Base: `<FEISHU_BASE_TOKEN>`
-- Table: `<FEISHU_TABLE_ID>`
+- App ID: `cli_aa87ff81f8795bdd`
+- Base: `ElgWbqZPqaO55YsVS7VcQqnhnJg`
+- Table: `tblT2WCWJmrB9ZMw`
 - View: `vewbtIgju6`
 
 Useful examples:
