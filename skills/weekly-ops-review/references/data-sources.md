@@ -12,7 +12,7 @@
 
 - **Table ID**: `tbl2l56CZpF0y1l1`
 - **Key**: (周, ASIN)
-- **Records per week**: ~50
+- **Records per week**: 动态数量；2026-11近期约270条，完整分页后以接口总数为准。
 
 **Direct fields:**
 
@@ -138,45 +138,10 @@
 - **Key**: MSKU
 - **Use**: Rarely needed directly (main table has lookups)
 
-### 5. 对标竞品 (Competitor Benchmarking)
-
-- **Table ID**: `tbl01F1ENSCP0fRi`
-- **Records**: ~36 (1 header row + ~35 competitor ASINs)
-- **Structure**: Pivoted — static attributes + date-pair columns (price + rank per snapshot)
-- **Date range**: 2026-03-08 to 2026-05-18, ~47 snapshot dates
-- **IMPORTANT**: JSON keys are Chinese field NAMES (e.g., `未命名_2`) and date strings (e.g., `5.18-US`), NOT field IDs. The first row is a header row — skip it (ASIN field = "ASIN").
-
-**Static attributes (JSON keys):**
-
-| JSON Key | Content | Example |
-|----------|---------|---------|
-| 未命名 | 序列 | "1" |
-| 未命名_1 | 类目 | "Heat Shrink Tubing" |
-| 未命名_2 | 竞品品牌 | "Eventronic" |
-| 未命名_3 | ASIN | "B0BVVMCY86" |
-| 未命名_4 | 图片 | (URL) |
-| 未命名_5 | 参数 | "3:1 ratio, 400pcs" |
-| 未命名_6 | 数量-pcs | "400" |
-| 未命名_7 | 变体数量 | "3" |
-| 未命名_8 | 变体价格 | (price range) |
-| 未命名_9 | review数量 | "32932" |
-| 未命名_10 | 星级 | "4.7" |
-| 未命名_11 | 广告架构 | "SP+SB+SBV" |
-| 未命名_12 | 广告打法 | (description) |
-| 未命名_13 | 定价策略 | "BD monthly" |
-| 未命名_14 | 备注 | (notes) |
-
-**Date-pair columns (JSON keys, e.g., `5.18-US` and `5.18-US_1`):**
-
-- `M.D-US` = 价格/促销 (price + promotion info as text, e.g. "13.99" or "BD-15.29" or "14.99-coupon10%")
-- `M.D-US_1` = 小类排名 (subcategory ranking as number string, e.g. "2")
-
-Dates range from `3.8-US` through `5.18-US`. Latest date = `5.18-US`, 4-weeks-ago ≈ `4.20-US`.
-
-### 6. 超龄库存报告 (Aging Inventory)
+### 5. 超龄库存报告 (Aging Inventory)
 
 - **Table ID**: `tblsMqzOk1fhNLh2`
-- **Records**: 637
+- **Records**: 动态数量；2026-11-18读取634条，不作为固定预期。
 - **Key**: 序列
 - **IMPORTANT**: JSON keys are English field names (e.g., `asin`, `surcharge-age-tier`), NOT field IDs. The Feishu `序列` auto-number field uses its Chinese name as the key.
 
@@ -212,15 +177,35 @@ Dates range from `3.8-US` through `5.18-US`. Latest date = `5.18-US`, 4-weeks-ag
                                         │
                                         │ Manual ASIN match (no formal link)
                                         v
-                               超龄库存报告  对标竞品
+                               超龄库存报告
 ```
 
-## Reading the Main Table by Week
+## 周筛选、分页与去重
 
-The `周` field uses format like "12-29~01-04" (month-day~month-day). To find records for a specific week, use `manage_bitable_record` with `action=search` and filter on the `周` field, or read all records (max 50 per week) and filter client-side.
+- 主表按 `年 + 周` 搜索，例如 `2026` 与 `11-09~11-15`；客户端复核 `周日期` 是否为预期周一。跨年周结合实际起始日期处理，不能只按MM-DD同名周匹配。
+- 至少读取目标周、上周，通常再取前两周。飞书 lookup 可能使 `年` 也是嵌套数字，需要解包。
+- 每周请求使用独立分页游标；从实际响应取 `pageToken/page_token`，直到 `hasMore/has_more` 为假，不自行编码或预测游标。
+- `page_size` 采用工具/API支持值，100或200均可；条数超过页大小时必须继续，不能假定一页即全量。
+- 记录保留 `record_id`；核对实际记录数、接口 `total`（如有）与唯一记录数。按周日期+ASIN检查重复，回查后再决定，不盲目合并/删除。
+- 停卖记录在获取阶段不排除；先保留完整周，再分别构建整体和在售范围。
+- 没有广告曝光字段时不推导CTR；报告直接省略该指标。
 
-## Pagination
+## 超龄快照
 
-- Main table: 50 records per week, typically fits in one page with `page_size=50`
-- 超龄库存: 637 records, use `page_size=200`, may need 4 pages
-- 对标竞品: ~36 records, one page with `page_size=50`
+`snapshot-date` 是快照/收费期线索，不等于周末FBA可售状态。检查所有快照日期，选择相应快照；不得跨快照重复累加同一库存。运营动作使用最新快照时明确日期。按 `asin` 与在售周表匹配后按父体汇总，保留币种和国家，不混加不同币种。
+
+## 字段解析
+
+- lookup：`{"type":2,"value":[304.52]}` → 304.52。
+- 富文本：`[{"text":"B08K78S7JW","type":"text"}]` → ASIN文本。
+- 嵌套文本 lookup：先解包 `value` 再提取 `text`。
+- 缺失/空数组保留null，合法0保留0；多值需核对匹配唯一性。
+- 使用显示字段名查值，表中field_id用于发现和核对；不假设记录JSON键一定是field_id。
+
+## 鉴权回退
+
+优先使用已配置的飞书用户插件只读查询。若其鉴权失败而本机已有凭证，可使用飞书官方API：
+1. 从已有的用户插件配置定位凭证；常见旧路径 `~/.feishu-user-plugin/credentials.json`，实际位置以本机已有配置为准。
+2. 通过 `POST https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal` 换取令牌；凭证和响应中的令牌只保留于内存。
+3. 使用 `GET /open-apis/bitable/v1/apps/{app_token}/tables/{table_id}/records` 查询并分页；参数、筛选和日期语义以实际接口支持为准。
+4. 不把凭证、Bearer或令牌写入代码、终端输出或报告，不因该回退修改记录或重新配置账号。

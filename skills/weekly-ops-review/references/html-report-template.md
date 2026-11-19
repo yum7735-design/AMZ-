@@ -1,202 +1,106 @@
-# HTML Report Template
+# 精简版周复盘 HTML
 
-## Structure
+默认沿用用户于2026-11-18确认的五板块结构。内容均来自本次计算，避免把示例周数字写成将来默认值。
 
-The report is a single self-contained HTML file with inline CSS. All styles are embedded — no external
-dependencies. The report is written in Chinese.
+## 页面结构
 
-## Layout Blueprint
+| 顺序 | 内容 | 默认展开方式 |
+|---|---|---|
+| 页头 | 标题、周范围、对比周、生成日期，简短范围注记 | 展示 |
+| 01 整体经营 | 四项KPI、流量转化行、2–3句经营判断 | 展示 |
+| 整体补充 | 六项成本对比、近3周趋势 | 折叠 |
+| 02 产品线 | 在售产品线总表；各线父体明细 | 总表展示，父体表折叠 |
+| 03 经营问题与优化 | 一父体一卡片：异常+利润成本+策略 | 前1–2个优先项展开，其余折叠 |
+| 04 库存健康 | 低库存、高覆盖、超龄费用摘要及明细 | 摘要展示，长表折叠 |
+| 05 评分变化 | 有效评分下跌明细、改善明细 | 下跌展示，改善折叠 |
+| 页尾 | 数据来源、范围、阈值、缺失/计算限制 | 简短小字 |
 
-```
-+--------------------------------------------------+
-| HEADER: 运营周经营复盘                              |
-| 周期: YYYY-Www (MM/DD~MM/DD) | 生成时间: YYYY-MM-DD |
-+--------------------------------------------------+
-| EXECUTIVE SUMMARY BANNER                          |
-| [N] 严重  [N] 预警  [N] 关注  |  最高风险: [text]    |
-+--------------------------------------------------+
-| SECTION 1: 关键指标总览 (按产品线汇总)               |
-| 表格: 产品线 | ASIN数 | 销售额 | 毛利润 | 毛利率 |    |
-|       广告费 | 广花比 | CPC | CTR | CVR | 退货率 | 库存健康 |
-+--------------------------------------------------+
-| SECTION 2: 异常识别与风险评估                        |
-| 每个有异常的产品一张卡片 (按严重度排序)                |
-+--------------------------------------------------+
-| SECTION 3: 产品线分层分析                            |
-| For each 产品线:                                    |
-|   - 产品线汇总卡片                                  |
-|   - 产品明细表 (全部产品)                             |
-|   - 竞品排名/价格趋势                                |
-+--------------------------------------------------+
-| SECTION 4: 超龄库存预警                              |
-| 按ASIN匹配的产品超龄库存明细                          |
-+--------------------------------------------------+
-| SECTION 5: 下一步动作建议                             |
-| 优先级排序表: 动作 | 关联ASIN | 建议 | 优先级          |
-+--------------------------------------------------+
-| FOOTER: 数据源说明 | 使用阈值 | 免责声明               |
-+--------------------------------------------------+
-```
+不单列重复的“异常识别”“利润专项”“下一步动作”三个大板块；同父体只在问题区有一份完整分析。产品线表只放摘要与跳转。
 
-## CSS Variables
+## 01 整体经营
 
-```css
-:root {
-  /* Colors */
-  --ink: #1c2430;
-  --muted: #627084;
-  --line: #d9e0ea;
-  --bg: #f7f9fc;
-  --surface: #ffffff;
-  --accent: #2563eb;
+四项KPI：销售额、毛利润、毛利率、广告花费/广花比；包含本周、上周和可用环比。
+紧凑辅助行：访客、订单、销量、整体转化率、CPC、广告CVR；退货变化对判断重要时加一句即可。
 
-  /* Severity */
-  --critical: #9b2c2c;
-  --critical-bg: #fef2f2;
-  --red: #c0392b;
-  --red-bg: #fef5f5;
-  --yellow: #a85b18;
-  --yellow-bg: #fffbeb;
-  --green: #0b6b58;
-  --green-bg: #f0fdf7;
+经营判断选2–3项真正重要的经营事实：规模/利润方向、费用主要对冲、大体量低利润父体等。使用金额及百分点支持，不重复逐个朗读KPI。
 
-  /* Layout */
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --max-width: 1200px;
-}
-```
+- 六项成本表：成本项、本周金额、上周金额、本周占比、上周占比、占比变化、合计。
+- 近3周表：销售、利润、毛利率、广告/广花比；需要时增加流量与订单。
+- 整体含停卖有数据产品。该注记在页头一行或页尾说明即可，不占用首页大块警示区域。
 
-## Card Component Classes
+## 02 产品线
 
-```css
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
-.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.card-body { font-size: 14px; line-height: 1.6; }
+默认在售口径，总表建议：
+产品线、在售子体数、销售额/环比、毛利润/环比、毛利率、广花比、CPC、广告CVR、异常父体数。
+无销量产品线可略过主表，但有费用/库存风险时在相应段落提示。
 
-.anomaly-card { border-left: 4px solid var(--line); }
-.anomaly-card.severity-critical { border-left-color: var(--critical); background: var(--critical-bg); }
-.anomaly-card.severity-red { border-left-color: var(--red); background: var(--red-bg); }
-.anomaly-card.severity-yellow { border-left-color: var(--yellow); background: var(--yellow-bg); }
-```
+父体折叠表建议：
+父ASIN/品名、定位、销售额/环比、毛利润/毛利率、广花比、代表排名/变化、风险标签。
+风险链接到问题卡片；没有核心异常但毛利低于8%时仍写“毛利率红线”。
 
-## Badge Component
+## 03 单父体问题卡片
+
+折叠标题应足以快速决定是否展开：
+严重等级、品名、父ASIN、产品线/定位、本周利润、销售变化和一项主要问题。
+
+展开后只使用这套顺序：
+
+1. **问题一句话**：金额影响、盈亏切换/增亏/减亏、单周或连续趋势。
+2. **关键指标**：销售额与环比、利润与环比、毛利率、广告花费/广花比、ACOS、同一代表子体排名；有意义的值才展示。
+3. **流量转化/费用/定位与风险**：短段落，对比访客、转化、订单、客单价；解释费用最大变化，必要时说明验证步骤。
+4. **六项成本表**：采购、广告、仓储、入库配置、促销、退款；包含两周金额和占比及变化。
+5. **优化动作与验收表**：时限、具体动作、验收/目标；通常1–4项，必要时更多。优先与实际证据匹配，不逐卡复制整套通用建议。
+
+- 销售变化不一定解释利润变化；已经减亏时须明确写减亏，不能写利润进一步恶化。
+- 没有足够证据时写具体“待核查”的问题环节，不宣称原因已证实。
+- 不显示主观打分和机械外推；目标是执行验收，不是保证收益。
+- 按严重度、绝对利润/销售影响排序，避免机械把微利小基数的大百分比当唯一优先级。
+- 用户要求精简时压缩重复文字，保留明细于折叠内部；不可截断丢弃高风险对象。
+
+## 04 库存与05评分
+
+- 库存三个摘要：有销量且覆盖不足1月的子体数、FBA>0且覆盖>6月的子体数、匹配父体超龄费用。
+- 明细各自折叠，不在页面展开上百条。低库存明细加销量、FBA、覆盖月数/粗算天数；超龄按父体汇总并注明快照。
+- 评分仅比较两周均>0的数据，下降达到0.1分展示；评论数用两周值或增量，改善折叠。
+- 评分、库存数量和各表明细保持一致，浮点边界按指标参考处理。
+
+## 表现约束
+
+- 单一UTF-8 HTML，内联CSS，数据内嵌，不依赖外部字体、CDN、在线接口。
+- 使用留白、统一表头、低饱和蓝灰色；红表示费用/利润恶化或排名下降，绿表示改善；减少大面积红底和重复徽章。
+- 默认视宽约1180px；桌面和390px手机布局可读；宽表局部横向滚动，禁止页面整体横向溢出。
+- 原生 `details/summary` 折叠；数字和文字可选复制；标题与卡片锚点有清楚标签。
+- 缺曝光时直接不生成CTR的卡片/列/段落，其他非关键缺失字段优先省略；必须保留的成本缺项用“待核对”，不能改成0。
+- 不出现竞品表、其是否存在/可用等表述，也不据无来源的外部动作归因。
+- 数据可用性说明不前置；页尾仅保留影响理解的口径、范围、真实缺失或快照限制。
+- 输出建议小于500KB，折叠减少视觉长度而非减少文件体积，必要时精简重复标记；不因体积丢弃必要记录。
+- 打印时可自动展开折叠明细；如不提供打印脚本，说明打印前手动展开。
+
+## 可复用CSS起点
 
 ```css
-.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-.badge-critical { background: var(--critical); color: white; }
-.badge-red { background: var(--red); color: white; }
-.badge-yellow { background: var(--yellow); color: white; }
-.badge-green { background: var(--green); color: white; }
-.badge-info { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+:root{--ink:#172b3a;--muted:#687b89;--line:#dfe7eb;--bg:#f4f7f8;--accent:#245a76;--bad:#b53b3d;--good:#16715c}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:var(--bg);font:14px/1.65 "Microsoft YaHei",sans-serif}
+main{max-width:1180px;margin:auto;padding:30px 22px 56px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+.kpis>div{padding:17px 20px;background:white}
+details{margin:10px 0;border:1px solid var(--line);border-radius:8px;background:white}
+summary{padding:13px 16px;cursor:pointer}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#eef3f5;white-space:nowrap}
+.good{color:var(--good)}.bad{color:var(--bad)}
+@media(max-width:760px){main{padding:20px 12px}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media print{body{background:white}.table-scroll{overflow:visible}}
 ```
 
-## Table Styles
+## 交付检查
 
-```css
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; padding: 8px 12px; border-bottom: 2px solid var(--line); color: var(--muted); font-weight: 600; }
-td { padding: 8px 12px; border-bottom: 1px solid var(--line); }
-tr:nth-child(even) { background: var(--bg); }
-tr:hover { background: #eef2ff; }
-
-.metric-up { color: var(--green); }
-.metric-down { color: var(--red); }
-.metric-stable { color: var(--muted); }
-```
-
-## Product Line Section
-
-Each product line gets a section block:
-
-```html
-<section class="product-line-section">
-  <h2 class="pl-title">产品线: <span class="pl-name">裸端子</span></h2>
-
-  <!-- Summary card -->
-  <div class="card pl-summary">
-    <div class="summary-grid">
-      <div class="summary-item"><span class="label">ASIN数</span><span class="value">20</span></div>
-      <div class="summary-item"><span class="label">总销售额</span><span class="value">$3,456</span></div>
-      <div class="summary-item"><span class="label">平均毛利率</span><span class="value">24.5%</span></div>
-      <div class="summary-item"><span class="label">异常ASIN</span><span class="value metric-down">3</span></div>
-    </div>
-  </div>
-
-  <!-- Product detail table -->
-  <table class="product-detail-table">
-    <!-- all products in this line -->
-  </table>
-
-  <!-- Competitor overlay (if applicable) -->
-  <div class="card competitor-overlay">
-    <h3>竞品动态</h3>
-    <!-- competitor trend summary for this product line -->
-  </div>
-</section>
-```
-
-## Anomaly Card Template
-
-```html
-<div class="card anomaly-card severity-red">
-  <div class="card-header">
-    <span class="badge badge-red">预警</span>
-    <strong>B08K78S7JW — 铜芯盒装-220pcs</strong>
-    <span class="badge badge-info">裸端子</span>
-  </div>
-  <div class="card-body">
-    <div class="anomaly-metrics">
-      <p><strong>异常指标：</strong>销售额环比 -28% (本周 $304 vs 上周 $423)</p>
-      <p><strong>关联信号：</strong>竞品 Eventronic B0BVVMCY86 降价 15%</p>
-    </div>
-    <div class="anomaly-analysis">
-      <p><strong>根因分析：</strong>竞品降价抢占了排名位置，同时广告CPC上升导致流量成本增加</p>
-    </div>
-    <div class="anomaly-risk">
-      <p><strong>风险评估：</strong>若持续2周，预计月销售额损失约$480</p>
-    </div>
-    <div class="anomaly-actions">
-      <p><strong>建议动作：</strong></p>
-      <ol>
-        <li>检查竞品降价是否为短期促销（关注对标竞品表未来更新）</li>
-        <li>评估是否调整Coupon至15%匹配竞品力度</li>
-        <li>监控未来3天小类排名变化</li>
-      </ol>
-    </div>
-  </div>
-</div>
-```
-
-## Responsive / Print
-
-```css
-@media print {
-  body { font-size: 12px; }
-  .card { break-inside: avoid; }
-  .anomaly-card { break-inside: avoid; }
-}
-
-@media (max-width: 768px) {
-  .summary-grid { grid-template-columns: repeat(2, 1fr); }
-  table { font-size: 11px; }
-}
-```
-
-## Output File Naming
-
-```
-ops-reports/2026-05-12_to_2026-05-18_ops_review.html
-```
-
-Where the date range is Monday-Sunday of the target week.
-
-## Key Implementation Notes
-
-1. All data is embedded directly in the HTML — no external JS, no API calls at render time
-2. Use `{{PLACEHOLDER}}` style markers or direct string interpolation when generating
-3. Chinese text must be properly encoded (utf-8 meta tag)
-4. Keep the file under 500KB — collapse detailed tables if too large
-5. Include a "Generated by weekly-ops-review skill" footer
-6. Do NOT reference other skills (voc-analysis, segment-market-capability, etc.) — the report is self-contained
-7. Metric values that are better than previous week get `metric-up` class (green), worse get `metric-down` class (red)
+- 五个主板块，没有重复利润/动作大板块；每个异常父体一张含费用与动作的卡片。
+- 整体口径含停卖且总额可回算；产品线在售口径明确；缺失指标未被0伪装。
+- 无CTR占位、无前置数据可用性大块、无竞品表相关文字。
+- 排名红绿和符号、费用方向、负利润环比方向正确。
+- 低库存和评分计数与明细一致；长表完整可展开；所有表头和行列对齐。
+- 完成后给绝对路径链接；页尾保留 `Generated by weekly-ops-review skill`。

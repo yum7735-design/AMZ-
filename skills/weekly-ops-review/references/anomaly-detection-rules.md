@@ -1,133 +1,120 @@
-# Anomaly Detection Rules
+# 指标与异常规则
 
-## Hard Thresholds
+适用于当前精简版周复盘；所有核心阈值在本文件维护。
 
-Apply these thresholds first. Any metric crossing a threshold triggers a flag before contextual rules are evaluated.
+## 统计与缺失
 
-### Sales & Profit
+- 整体包含有经营数据的“卖”“不卖”产品；产品线、父体、异常、库存及评分采用在售子体。
+- 数值缺失保留 null；合法0不能被真值判断滤掉。分母为0或缺失时显示“— / 无可比基数”，不输出Infinity、NaN或虚构百分比。
+- 汇总金额、件数、订单、访客、点击后计算比率。部分关键数值缺失时回退来源并标注覆盖范围，不把不完整小计声称为完整总额。
+- 访客跨子体相加是记录口径的访客合计，不声称为去重独立用户。
 
-| Metric | Red Alert | Yellow Alert | Direction |
-|--------|-----------|--------------|-----------|
-| 销售额环比 (WoW) | < -20% | < -10% | lower is worse |
-| 毛利润环比 (WoW) | < -20% | < -10% | lower is worse |
-| 毛利率（在售产品） | < 8% | 8%–10% | lower is worse |
+| 指标 | 计算 |
+|---|---|
+| 销售额/销量/订单/访客/利润等 | 对同一范围的原始值求和 |
+| 毛利率 | 毛利润合计 ÷ 销售额合计 |
+| 广花比 | 广告花费合计 ÷ 销售额合计 |
+| CPC | 广告花费合计 ÷ 广告点击合计 |
+| 广告CVR | 广告订单合计 ÷ 广告点击合计 |
+| ACOS | 广告花费合计 ÷ 广告销售额合计 |
+| 整体转化率 | 订单量合计 ÷ 访客合计 |
+| 客单价 | 销售额合计 ÷ 订单量合计 |
+| 退货率 | 本周退货量合计 ÷ 本周销量合计；不声称同一订单队列的退货概率 |
+| CTR（条件指标） | 有有效曝光量时，广告点击合计 ÷ 曝光合计；否则不计算、不渲染也不加缺失说明 |
 
-### Advertising
+### 环比与百分点
 
-| Metric | Red Alert | Yellow Alert | Direction |
-|--------|-----------|--------------|-----------|
-| 广花比 (Ad/Sales) | > 30% | > 20% | higher is worse |
-| CPC变动 (WoW) | > +30% | > +15% | higher is worse |
-| CTR变动 (WoW) | < -30% | < -15% | lower is worse |
-| CVR变动 (WoW) | < -30% | < -15% | lower is worse |
+- 环比统一用 `(本周 - 上周) / abs(上周)`，上周为0或缺失时不计算。
+- 利润从 -100 到 -60：改善40%、减亏40；从 -100 到 -150：恶化50%、增亏50。由盈转亏同时展示绝对金额，小基数巨大百分比不能成为唯一判断依据。
+- 比率变动用 `(本周比率 - 上周比率) × 100` pp，与相对环比区别标注。
+- 连续两周下滑需连续两次周环比下降，不能用本周比三周前低替代。
 
-### Returns & Quality
+### 六项成本
 
-| Metric | Red Alert | Yellow Alert | Direction |
-|--------|-----------|--------------|-----------|
-| 退货率 | > 8% | > 5% | higher is worse |
-| 评分下跌 (absolute) | > -0.3 | > -0.1 | lower is worse |
+采购成本、广告花费、仓储费、入库配置费、促销成本、退款金额。
 
-### Ranking & Traffic
+- 同范围内先求和有符号金额，再取绝对值展示费用负担；占比为该绝对金额÷销售额。
+- 只有占比字段时按销售额加权，不平均各子体占比；金额与比例冲突先回查。
+- `costDelta = abs(本周占比) - abs(上周占比)`：正值=成本上升，红色；负值=下降，绿色。
+- 合计为六项费用之和，说明不覆盖所有平台费用，不强行使其变化精确等于毛利率变化。
+- 仓储费/退款金额单周增加只证实费用变动；核对收费期和订单后再下根因结论。
 
-| Metric | Red Alert | Yellow Alert | Direction |
-|--------|-----------|--------------|-----------|
-| 小类排名下降 (positions) | > 30 | > 15 | higher is worse |
-| 转化率变动 (MoM) | < -30% | < -15% | lower is worse |
+## 父ASIN核心异常
 
-### Inventory
+仅以下三条触发核心异常；均使用在售子体聚合值：
 
-| Metric | Red Alert | Yellow Alert | Direction |
-|--------|-----------|--------------|-----------|
-| 可售库存预计售卖月 | < 0.5 | < 1.0 | lower is worse |
-| FBA可售库存变动 (MoM) | < -40% | < -20% | lower is worse |
+1. 销售额环比 < -15%。
+2. 毛利润环比 < -15%。
+3. 本周毛利润 < 0。
 
-## Contextual Rules
+| 等级 | 判定 |
+|---|---|
+| 严重 | 至少2条核心异常，或本周利润为负且销售额较上周下降 |
+| 预警 | 命中1条且不满足严重 |
+| 关注 | 未命中核心异常，销售额或利润下降10%–15%，含边界 |
+| 未触发 | 无上述触发；仍展示实际低毛利等辅助标签 |
 
-Apply these AFTER hard thresholds. They can escalate, de-escalate, or add new flags.
+明确判断环比非空后才比较，避免把 null 当0。不得因多个辅助信号、产品线同向下降、季节性或新品周期自动更改核心等级。周边背景用于解释与动作排序。
 
-### Rule 1: Seasonal Adjustment
+### 在售毛利率
 
-**When**: Product's `周` falls in a known seasonal transition period (e.g., post-Q4 holiday in Jan, post-Prime Day in Jul).
+- <8%：毛利率红线。
+- 8%–10%（含8%、不含10%）：毛利率关注。
+- ≥10%：无毛利率标签。
+- 低毛利本身不构成新增核心异常，勿将整个父体标成绿色“正常”并掩盖红线。
+- 新品阶段可以解释投入目标，但不把8%标准擅自降到5%。
 
-**Action**: Relax sales/profit thresholds by 50%. A 20% sales drop in January is normal post-holiday.
+## 辅助信号
 
-**Implementation**: Check if > 60% of products in the same product line also show sales decline → if yes, likely seasonal category trend.
+以下用于证据链，不单独累计核心异常数量：
 
-### Rule 2: Lifecycle Leniency
+| 指标 | 关注 | 强信号 |
+|---|---|---|
+| 广花比 | >20% | >30% |
+| CPC环比 | >15% | >30% |
+| 广告CVR/整体转化率环比 | <-15% | <-30% |
+| 退货率 | >5% | >8% |
+| 评分下跌 | ≥0.1分 | ≥0.3分 |
+| 同一代表子体小类排名变差 | >15位 | >30位 |
+| 可售覆盖 | <1月 | <0.5月 |
 
-**When**: `生命周期` is "导入期" or "成长期".
+当前表缺少曝光量时跳过CTR，不生成相关卡片、列、异常或说明。
 
-**Action**: 广花比 threshold relaxed to > 45% for red, > 35% for yellow. Profit margin thresholds relaxed to > 5% red, > 10% yellow. High ad spend during launch/growth is expected.
+### 排名与定位
 
-### Rule 3: Product-Line Relative Benchmarking
+- 先选有目标排名的在售子体，再按本周销量最高选择代表；仍相同时可按销售额选。上周比较同一ASIN、同一类目排名，缺任一值则无可比变化。
+- `rankDelta = 本周排名 - 上周排名`。
+- <0：绿色“上升 +N 位”；>0：红色“下降 -N 位”；=0：“持平”。
+- 数字越小越好；不平均不同子体/类目排名。目标gap=实际排名−目标排名，>20或连续扩大时给定位提示。
+- 排名下降不直接证明销售变化由外部抢量造成；对照自然流量、Buy Box和广告验证。
 
-**When**: Multiple products in the same `产品线` show the same directional change.
+### 评分
 
-**Action**: Annotate the anomaly as "品类趋势" rather than "产品问题". If the entire product line is declining, the root cause is external (category demand shift, seasonality, major competitor entry) — not product-specific.
+- 仅两周评分均>0才可计算差异；0/空值是缺失，不是“从0分涨到4.8分”。
+- 以星级精度计算 `round(curr - prev, 1)` 或先转整数十分位，防止浮点数漏掉-0.1边界。
+- 评分变化与评论数增量按子ASIN列示；父体共享评论数不重复相加。
+- 评分下降≥0.1的数量须与明细一致。下降默认展示；改善可折叠。
+- 评分下降与退货率升高并发时优先查近期低星、退货原因和批次；未确认前写“待核查”。
 
-**Implementation**: Group products by `产品线`. If ≥ 70% of products in a line show the same directional anomaly, tag as "品类趋势" and de-escalate individual product severity by one level.
+### 库存与超龄
 
-### Rule 4: Competitor Threat Escalation
+- 低库存：在售 + 本周销量>0 + 有效覆盖月数<1；<0.5月优先。库存=0且有销量不能漏掉。
+- 零销量时覆盖月数若为0/空值，不据此生成断货预警；单列“无销量/覆盖待评估”如有必要。
+- 健康库存1–3月；>3至6月可列覆盖偏高；滞销预警需FBA库存>0且有效覆盖>6月。
+- 使用源表覆盖字段，天数按月数×30为粗算并说明；不要用销售额加权的父体覆盖掩盖子体断货。
+- 超龄费用先选与目标周期相符的快照；需要最新运营快照时注明日期。不要叠加不同快照重复收费；如必须使用晚于目标周的快照，应明确为当前库存行动参考，不能回溯成目标周事实。
+- 以ASIN匹配并按父体汇总涉及子体、收费数量、费用和库龄层；区分国家、币种，不能无换算混合。
+- 附加费是相应快照/收费期金额，不推测为每周费用，不和已含仓储费再次扣减利润。
 
-**When**: A product's `小类排名` declines AND at least one competitor in the same subcategory shows price drop > 10% AND rank improvement > 20 positions in the same period.
+## 根因与动作匹配
 
-**Action**: Escalate to "严重" (critical). Tag as "竞争威胁 — 竞品降价抢量". This is the highest-priority anomaly because it indicates active competitive pressure.
+| 证据 | 判断范围 | 动作方向 |
+|---|---|---|
+| 销售下降、访客下降 | 流量端承压 | 核查Buy Box、自然词位、广告曝光/关键词覆盖 |
+| 访客相近、转化率下降 | 转化端承压 | 核对价格、促销、变体、页面与低星评论 |
+| 利润下降、广花比上升 | 广告负担增加 | 下钻搜索词/活动，收缩无转化入口并保护有效流量 |
+| 仓储费占比上升 | 已证实费用增加，原因待核对 | 查计费期间、库龄、积压子体 |
+| 退款与低星并发 | 质量/预期偏差待核查 | 查退款订单、批次、评论与退货原因 |
+| 库存不足且排名走弱 | 断货与流量双重风险 | 在途ETA、加急或按利润控速 |
 
-**Data needed**: Cross-reference `周复盘.小类排名` with `对标竞品` recent price/rank trends.
-
-### Rule 5: Compounding Escalation
-
-**When**: 2+ yellow alerts fire on the same product simultaneously.
-
-**Action**: Escalate to red.
-
-**When**: 1 red + 1 yellow, or 2+ reds.
-
-**Action**: Escalate to "严重" (critical). Multiple simultaneous anomalies indicate a systemic issue rather than a single-metric blip.
-
-### Rule 6: Inventory-Rating Coupling
-
-**When**: `FBA可售库存` drops below 1 month of sales AND `评分` drops ≥ 0.1 in the same period.
-
-**Action**: Flag as "紧急 — 断货+声誉双重风险". The product risks running out of stock while also accumulating negative reviews. Prioritize restocking AND addressing review issues simultaneously.
-
-### Rule 7: Return-Rating Coupling (Quality Incident)
-
-**When**: `退货率` increases > 3 percentage points WoW AND `评分` drops ≥ 0.2 in the same week.
-
-**Action**: Flag as "质量事故 — 疑似批次缺陷或Listing描述不准确". Recommend immediate VOC deep-dive on recent returns and negative reviews.
-
-## Severity Levels Summary
-
-| Level | CSS Class | Badge | Trigger |
-|-------|-----------|-------|---------|
-| Critical | severity-critical | 严重 | Compounding (Rule 5) or Competitor threat (Rule 4) |
-| Red | severity-red | 预警 | Single hard threshold crossed |
-| Yellow | severity-yellow | 关注 | Yellow threshold crossed |
-| Green | severity-info | 正常 | No thresholds crossed |
-
-## Root Cause Pattern Matching
-
-Map anomaly combinations to likely root causes:
-
-| Anomaly Pattern | Root Cause | Suggested Actions |
-|----------------|------------|-------------------|
-| Sales ↓ + CPC ↑ + CTR ↓ | 流量成本上升 | 降低非转化词出价, 提高精准匹配比例 |
-| Sales ↓ + Competitor Price ↓ + Competitor Rank ↑ | 竞品降价抢量 | 评估竞品策略持续性, 调整Coupon/价格, 优化Listing |
-| Sales ↓ + Rating ↓ + Return Rate ↑ | 质量/Listing问题 | 检查近期差评和退货原因, 更新Listing描述, 联系买家 |
-| Sales ↓ + FBA库存 ↓ | 断货风险 | 加速补货, 或提价减缓出单速度延缓断货 |
-| Margin ↓ + 广花比 ↑ + Sales flat | 过度投放 | 降低广告预算, 聚焦高CVR关键词 |
-| Sales ↓ + Rank ↓ (no other signals) | Listing权重下降 | 检查Buy Box, 检查是否被跟卖, 检查类目节点变化 |
-| All products in line declining | 品类趋势 | 评估是否季节性/市场萎缩, 不做单品调整 |
-
-## Metric Extraction Notes
-
-When reading from the main table, metric values come in nested structures:
-
-- **Lookup fields**: `{"type": 2, "value": [304.52]}` → extract `value[0]`
-- **Text fields**: `[{"text": "B08K78S7JW", "type": "text"}]` → extract `[0].text`
-- **Formula fields**: Same as type 2. Parse `value[0]` as float.
-- **Date fields**: `{"type": 5, "value": [1766937600000]}` → Unix ms timestamp
-
-For WoW comparisons, compute `(current - previous) / previous` from the raw values. Formula fields like `销售额环比` are pre-computed by Feishu but may be stale if source data hasn't refreshed.
+所有动作附时限和可检查的验收目标；优化目标与已实现改善必须明确区分。
